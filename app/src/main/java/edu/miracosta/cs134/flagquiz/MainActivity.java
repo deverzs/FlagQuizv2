@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        Log.i("ON CREATE MENU SECTION", getString(R.string.default_region));
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -69,23 +70,11 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
+        Log.i("ON ITEM SECTION*****", item.toString());
         return super.onOptionsItemSelected(item);
 
     }
 
-
-    public void updateRegion(String region) //will look like North_America, in file it is North America
-    {
-        //only pull countries where the region matches
-        mRegion = region.replaceAll("_", " ");
-
-        //All regions are
-    }
-
-    public void updateChoices()
-    {
-
-    }
 
 
     @Override
@@ -112,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // TODO: Set mQuestionNumberTextView's text to the appropriate strings.xml resource
+        // DONE: Set mQuestionNumberTextView's text to the appropriate strings.xml resource
         //in activity_main  Question %1$d of %2$d, d is integer, f is float, both args ints, so need two args
         //in strings.xml is "Question"
         //if we want to set text and look up string, getString
@@ -222,6 +211,26 @@ public class MainActivity extends AppCompatActivity {
         mButtons[rng.nextInt(mButtons.length)].setText(mCorrectCountry.getName());
     }
 
+
+
+    public void updateRegion(String region) //will look like North_America, in file it is North America
+    {
+        //only pull countries where the region matches
+        mRegion = region.replaceAll("_", " ");
+
+
+        //All regions are
+    }
+
+    public void updateChoices(int input)
+    {
+
+    }
+
+
+
+
+
     /**
      * Handles the click event of one of the 4 buttons indicating the guess of a country's name
      * to match the flag image displayed.  If the guess is correct, the country's name (in GREEN) will be shown,
@@ -273,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                 //alert dialog
                 //after all 10 flags tells percent and number of guesses and option to reset the quiz
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getString(R.string.results, mTotalGuesses, (double)(mTotalGuesses/mCorrectGuesses)  )); // this is wrong
+                builder.setMessage(getString(R.string.results, mTotalGuesses, ((double)mCorrectGuesses /mTotalGuesses) *100   )); // this is wrong
 
                 //set the positive button of the dialog
                 //positive button means reset quiz - looks like a hyperlink
@@ -299,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        Log.i(("MAKE GUESS"), "We're inside here ... ");
 
 
         // DONE: then display correct answer in green text.  Also, disable all 4 buttons (can't keep guessing once it's correct)
@@ -311,18 +321,26 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+     //Log.i("REGIONS SECTION", "NOTHING YET");
+
+
     SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
+
+            Log.i("REGIONS SECTION", getString(R.string.default_region));
             if (key.equals(REGIONS)) //regions
                 {
                     String region = sharedPreferences.getString(REGIONS, getString(R.string.default_region));
+                    Log.i("REGIONS SECTION", getString(R.string.default_region));
                     updateRegion(region); resetQuiz();
                 }
             else if (key.equals(CHOICES)) //number of buttons
             {
                 mChoices = Integer.parseInt(sharedPreferences.getString(CHOICES, getString(R.string.default_choices)));
-                updateChoices(); resetQuiz();
+                updateChoices(mChoices); resetQuiz();
+                Log.i("CHOICE", String.format("CHOICE: %d,",4));
             }
 
             Toast.makeText(MainActivity.this, R.string.restarting_quiz, Toast.LENGTH_SHORT).show(); } };
