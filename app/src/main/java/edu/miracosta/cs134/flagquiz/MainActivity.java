@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,15 +35,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Flag Quiz";
 
     private static final int FLAGS_IN_QUIZ = 3;
-    public static final String REGIONS = "pref_numberOfChoices";
-    public static final String CHOICES = "pref_regions" ;
+    public static final String CHOICES = "pref_numberOfChoices";
+    public static final String REGIONS = "pref_regions" ;
 
-    //Keep tracj of the current number of choices
+    //Keep track of the current number of choices
     private int mChoices = 4;
     //Keep track of the current region selected
     private String mRegion = "All";
 
-    private Button[] mButtons = new Button[4]; //array of 4 buttons, named button, button1
+    private Button[] mButtons = new Button[8]; //array of 8 buttons, named button, button1
     private List<Country> mAllCountriesList;  // all the countries loaded from JSON
     private List<Country> mQuizCountriesList; // countries in current quiz (just 10 of them)
     private Country mCorrectCountry; // correct country for the current question
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        Log.i("ON CREATE MENU SECTION", getString(R.string.default_region));
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -98,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
         mButtons[1] = findViewById(R.id.button2);
         mButtons[2] = findViewById(R.id.button3);
         mButtons[3] = findViewById(R.id.button4);
+        mButtons[4] = findViewById(R.id.button5);
+        mButtons[5] = findViewById(R.id.button6);
+        mButtons[6] = findViewById(R.id.button7);
+        mButtons[7] = findViewById(R.id.button8);
 
 
 
@@ -202,13 +204,13 @@ public class MainActivity extends AppCompatActivity {
         //fill all with random and then replace 1 with correct
         // DONE: Loop through all 4 buttons, enable them all and set them to the first 4 countries
         // DONE: in the all countries list
-        for (int i = 0; i < mButtons.length ; i++) {
+        for (int i = 0; i < mChoices ; i++) {
             mButtons[i].setEnabled(true); //allows clicking - need to make sure enables
             mButtons[i].setText(mAllCountriesList.get(i).getName());
         }
 
         // DONE: After the loop, randomly replace one of the 4 buttons with the name of the correct country
-        mButtons[rng.nextInt(mButtons.length)].setText(mCorrectCountry.getName());
+        mButtons[rng.nextInt(mChoices)].setText(mCorrectCountry.getName());
     }
 
 
@@ -224,6 +226,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateChoices(int input)
     {
+        mChoices = input;
+
+
+        for (int i = 0; i < mChoices ; i++) {
+            mButtons[i].setEnabled(true); //allows clicking - need to make sure enables
+            //mButtons[i].setText(mAllCountriesList.get(i).getName());
+        }
+
+        for (int i = mChoices; i < mButtons.length ; i++) {
+            mButtons[i].setEnabled(false); //allows clicking - need to make sure enables
+            //mButtons[i].setText(mAllCountriesList.get(i).getName());
+        }
+
 
     }
 
@@ -241,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
     //after the guess, all 4 buttons are checked for the right answer
     //attached to 4 buttons and need to know which button, so downcast view to button
     public void makeGuess(View v) {
+
 
         //Test for wiring of buttons
         //Toast.makeText(this, "Nope!", Toast.LENGTH_SHORT).show();
@@ -269,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+
                         loadNextFlag();
                     }
                 }, 2000) ; //build object on fly and need the time delay in the parameter
@@ -298,11 +315,29 @@ public class MainActivity extends AppCompatActivity {
                 builder.create();
                 builder.show();
 
-                mAnswerTextView.setTextColor(getResources().getColor(R.color.incorrect_answer));
+
+                mAnswerTextView.setTextColor(getResources().getColor(R.color.correct_answer));
 
 
 
             }
+
+        }
+        else{
+            mAnswerTextView.setTextColor(getResources().getColor(R.color.incorrect_answer));
+            mAnswerTextView.setText(getString(R.string.incorrect_answer));
+            clickedButton.setEnabled(false);
+
+            //wait and remove incorrect message
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mAnswerTextView.setText("");
+                }
+            }, 1000) ;
+
+
+
 
         }
 
